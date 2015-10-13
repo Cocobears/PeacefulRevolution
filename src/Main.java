@@ -32,65 +32,82 @@ public class Main {
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 5; y++) {
                 Color n;
+                street[0][0] = new JLabel(game.routeShape[TESTADDRESS].substring(0, 1));
 
-                street[0][0] = new JLabel();
                 System.out.println("streetbit1:" + game.routeShape[TESTADDRESS].substring(0, 1)+":");
                 System.out.println("streetbit2:"+game.routeShape[TESTADDRESS].substring(1, 2)+":");
                 if (game.routeShape[TESTADDRESS].substring(0, 1).equals(" ")) n = Color.BLACK;
                 else {
                     n = Color.red;
                 }
+                street[0][0].setOpaque(true);
                 street[0][0].setBackground(n);
-                street[0][1] = new JLabel();
+                street[0][1] = new JLabel(game.routeShape[TESTADDRESS].substring(1, 2));
                 if (game.routeShape[TESTADDRESS].substring(1, 2).equals(" ")) n = Color.BLACK;
                 else {
                     n = Color.red;
                 }
+                street[0][1].setOpaque(true);
                 street[0][1].setBackground(n);
-                street[0][2] = new JLabel();
+                street[0][2] = new JLabel(game.routeShape[TESTADDRESS].substring(2, 3));
                 if (game.routeShape[TESTADDRESS].substring(2, 3).equals(" ")) n = Color.BLACK;
                 else {
                     n = Color.red;
                 }
+                street[0][2].setOpaque(true);
                 street[0][2].setBackground(n);
-                street[1][0] = new JLabel();
+                street[1][0] = new JLabel(game.routeShape[TESTADDRESS].substring(3, 4));
                 if (game.routeShape[TESTADDRESS].substring(3, 4).equals(" ")) n = Color.BLACK;
                 else {
                     n = Color.red;
                 }
+                street[1][0].setOpaque(true);
                 street[1][0].setBackground(n);
-                street[1][1] = new JLabel();
-                if (game.routeShape[TESTADDRESS].substring(0, 1).equals(" ")) n = Color.BLACK;
+                street[1][1] = new JLabel(game.routeShape[TESTADDRESS].substring(4, 5));
+                if (game.routeShape[TESTADDRESS].substring(4, 5).equals(" ")) n = Color.BLACK;
                 else {
                     n = Color.red;
-                }
+                }street[1][1].setOpaque(true);
                 street[1][1].setBackground(n);
-                street[1][2] = new JLabel();
-                if (game.routeShape[TESTADDRESS].substring(0, 1).equals(" ")) n = Color.BLACK;
+                street[1][2] = new JLabel(game.routeShape[TESTADDRESS].substring(5, 6));
+                if (game.routeShape[TESTADDRESS].substring(5, 6).equals(" ")) n = Color.BLACK;
                 else {
                     n = Color.red;
                 }
+                street[1][2].setOpaque(true);
                 street[1][2].setBackground(n);
-                street[2][0] = new JLabel();
-                if (game.routeShape[TESTADDRESS].substring(0, 1).equals(" ")) n = Color.BLACK;
+                street[2][0] = new JLabel(game.routeShape[TESTADDRESS].substring(6, 7));
+                if (game.routeShape[TESTADDRESS].substring(6, 7).equals(" ")) n = Color.BLACK;
                 else {
                     n = Color.red;
                 }
+                street[2][0].setOpaque(true);
                 street[2][0].setBackground(n);
-                street[2][1] = new JLabel();
-                if (game.routeShape[TESTADDRESS].substring(0, 1).equals(" ")) n = Color.BLACK;
+                street[2][1] = new JLabel(game.routeShape[TESTADDRESS].substring(7, 8));
+                if (game.routeShape[TESTADDRESS].substring(7, 8).equals(" ")) n = Color.BLACK;
                 else {
                     n = Color.red;
-                }
+                }street[2][1].setOpaque(true);
                 street[2][1].setBackground(n);
-                street[2][2] = new JLabel();
-                if (game.routeShape[TESTADDRESS].substring(0, 1).equals(" ")) n = Color.BLACK;
+                street[2][2] = new JLabel(game.routeShape[TESTADDRESS].substring(8, 9));
+                if (game.routeShape[TESTADDRESS].substring(8, 9).equals(" ")) n = Color.BLACK;
                 else {
                     n = Color.red;
                 }
+                street[2][2].setOpaque(true);
                 street[2][2].setBackground(n);
+                street[0][0].setPreferredSize(new Dimension(35, 35));
+                street[0][1].setPreferredSize(new Dimension(35,35));
+                street[0][2].setPreferredSize(new Dimension(35, 35));
+                street[1][0].setPreferredSize(new Dimension(35,35));
+                street[1][1].setPreferredSize(new Dimension(35, 35));
+                street[1][2].setPreferredSize(new Dimension(35,35));
+                street[2][0].setPreferredSize(new Dimension(35, 35));
+                street[2][1].setPreferredSize(new Dimension(35,35));
+                street[2][2].setPreferredSize(new Dimension(35, 35));
 
                 JPanel givenStreet = new JPanel();
+                givenStreet.setLayout(new GridLayout(3,3));
                 givenStreet.add(street[0][0]);
                 givenStreet.add(street[0][1]);
                 givenStreet.add(street[0][2]);
@@ -195,6 +212,7 @@ public class Main {
                 board.setVisible(true);
             }
         }
+        board.setPreferredSize(new Dimension(400,300));
         //data table
         JPanel data = new JPanel(new GridLayout(2, 8));
         JLabel labelSUPPORT = new JLabel("SUPPORT:");
@@ -239,7 +257,7 @@ public class Main {
 
 
         mainFrame.setTitle("Peaceful Power");
-        mainPanel.setSize(800, 640);
+        mainPanel.setPreferredSize(new Dimension(800, 640));
         mainPanel.add(board, BorderLayout.CENTER);
         mainPanel.add(playerScreenNorth, BorderLayout.NORTH);
         mainPanel.add(playerScreenEast, BorderLayout.EAST);
@@ -252,4 +270,5 @@ public class Main {
         mainFrame.pack();
         mainFrame.setVisible(true);
     }
+
 }
