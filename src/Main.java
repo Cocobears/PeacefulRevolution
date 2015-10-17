@@ -4,7 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -16,128 +17,96 @@ public class Main {
     static JComboBox numberOfPlayers = new JComboBox();
     static LinkedList<PlayerData> playerData = new LinkedList<PlayerData>();
     static JFrame mainFrame = new JFrame();
-    static JPanel[][] cityStreets = new JPanel[9][5];
+    static JPanel[] cityStreets = new JPanel[45];
     static JLabel[][] street = new JLabel[3][3];
-
+    static JTextField nameField = new JTextField();
+    static JPanel cardPanel = new JPanel();
+    static String currentCard ;
+    static JPanel board = new JPanel(new GridLayout(5, 9));
+    static boolean clickable =true;
+    static JButton endTurn;
     public static void main(String[] args) {
         GameData game = new GameData();
         //define panels for the citymap
-        for (int x = 0; x < 9; x++) {
-            for (int y = 0; y < 5; y++) {
-                cityStreets[x][y] = new JPanel();
-            }
+
+        for (int x = 0; x < 45; x++) {
+
+             cityStreets[x] = new JPanel();
+
         }
-        //create the streets
-        int TESTADDRESS = (int) (Math.random() * 45);
-        for (int x = 0; x < 9; x++) {
-            for (int y = 0; y < 5; y++) {
-                Color n;
-                street[0][0] = new JLabel(game.routeShape[TESTADDRESS].substring(0, 1));
+        //create the streets as a test
+        //setup the streets
+        int cardValue = -1;
+        int index = 0;
+        for (int x = 0; x < 45; x++) {
 
-                System.out.println("streetbit1:" + game.routeShape[TESTADDRESS].substring(0, 1)+":");
-                System.out.println("streetbit2:"+game.routeShape[TESTADDRESS].substring(1, 2)+":");
-                if (game.routeShape[TESTADDRESS].substring(0, 1).equals(" ")) n = Color.BLACK;
-                else {
-                    n = Color.red;
-                }
-                street[0][0].setOpaque(true);
-                street[0][0].setBackground(n);
-                street[0][1] = new JLabel(game.routeShape[TESTADDRESS].substring(1, 2));
-                if (game.routeShape[TESTADDRESS].substring(1, 2).equals(" ")) n = Color.BLACK;
-                else {
-                    n = Color.red;
-                }
-                street[0][1].setOpaque(true);
-                street[0][1].setBackground(n);
-                street[0][2] = new JLabel(game.routeShape[TESTADDRESS].substring(2, 3));
-                if (game.routeShape[TESTADDRESS].substring(2, 3).equals(" ")) n = Color.BLACK;
-                else {
-                    n = Color.red;
-                }
-                street[0][2].setOpaque(true);
-                street[0][2].setBackground(n);
-                street[1][0] = new JLabel(game.routeShape[TESTADDRESS].substring(3, 4));
-                if (game.routeShape[TESTADDRESS].substring(3, 4).equals(" ")) n = Color.BLACK;
-                else {
-                    n = Color.red;
-                }
-                street[1][0].setOpaque(true);
-                street[1][0].setBackground(n);
-                street[1][1] = new JLabel(game.routeShape[TESTADDRESS].substring(4, 5));
-                if (game.routeShape[TESTADDRESS].substring(4, 5).equals(" ")) n = Color.BLACK;
-                else {
-                    n = Color.red;
-                }street[1][1].setOpaque(true);
-                street[1][1].setBackground(n);
-                street[1][2] = new JLabel(game.routeShape[TESTADDRESS].substring(5, 6));
-                if (game.routeShape[TESTADDRESS].substring(5, 6).equals(" ")) n = Color.BLACK;
-                else {
-                    n = Color.red;
-                }
-                street[1][2].setOpaque(true);
-                street[1][2].setBackground(n);
-                street[2][0] = new JLabel(game.routeShape[TESTADDRESS].substring(6, 7));
-                if (game.routeShape[TESTADDRESS].substring(6, 7).equals(" ")) n = Color.BLACK;
-                else {
-                    n = Color.red;
-                }
-                street[2][0].setOpaque(true);
-                street[2][0].setBackground(n);
-                street[2][1] = new JLabel(game.routeShape[TESTADDRESS].substring(7, 8));
-                if (game.routeShape[TESTADDRESS].substring(7, 8).equals(" ")) n = Color.BLACK;
-                else {
-                    n = Color.red;
-                }street[2][1].setOpaque(true);
-                street[2][1].setBackground(n);
-                street[2][2] = new JLabel(game.routeShape[TESTADDRESS].substring(8, 9));
-                if (game.routeShape[TESTADDRESS].substring(8, 9).equals(" ")) n = Color.BLACK;
-                else {
-                    n = Color.red;
-                }
-                street[2][2].setOpaque(true);
-                street[2][2].setBackground(n);
-                street[0][0].setPreferredSize(new Dimension(35, 35));
-                street[0][1].setPreferredSize(new Dimension(35,35));
-                street[0][2].setPreferredSize(new Dimension(35, 35));
-                street[1][0].setPreferredSize(new Dimension(35,35));
-                street[1][1].setPreferredSize(new Dimension(35, 35));
-                street[1][2].setPreferredSize(new Dimension(35,35));
-                street[2][0].setPreferredSize(new Dimension(35, 35));
-                street[2][1].setPreferredSize(new Dimension(35,35));
-                street[2][2].setPreferredSize(new Dimension(35, 35));
+            Color n;
+            //
 
-                JPanel givenStreet = new JPanel();
-                givenStreet.setLayout(new GridLayout(3,3));
-                givenStreet.add(street[0][0]);
-                givenStreet.add(street[0][1]);
-                givenStreet.add(street[0][2]);
-                givenStreet.add(street[1][0]);
-                givenStreet.add(street[1][1]);
-                givenStreet.add(street[1][2]);
-                givenStreet.add(street[2][0]);
-                givenStreet.add(street[2][1]);
-                givenStreet.add(street[2][2]);
-                cityStreets[x][y].add(givenStreet);
-            }
+            System.out.println(cardValue);
+            cardValue = getRandomCard();
+            JPanel givenStreet = drawStreet(GameData.routeShape[cardValue]);
+            //cityStreets[x][y].setLocation(35*x,35*y);
+            cityStreets[x].add(givenStreet);
+
         }
         new Main();
 
     }
 
+    private static JPanel drawStreet(String s) {
+        Color n;
+        JLabel[][] street = new JLabel[3][3];
+
+        for(int x = 0;x<3;x++){
+            for(int y = 0; y< 3;y++){
+                int stringIndex = x*3+y;
+                street[x][y] = new JLabel();
+                if(s.charAt(0)=='#') {//if it is a mappiece
+                    if (s.charAt(stringIndex) == (' ')) n = Color.BLACK;
+                    else {
+                        n = Color.red;
+                    }
+                    street[x][y].setOpaque(true);
+                    street[x][y].setBackground(n);
+                    street[x][y].setPreferredSize(new Dimension(35, 35));
+                }
+            }
+        }
+        JPanel givenStreet = new JPanel();
+        givenStreet.setLayout(new GridLayout(3, 3));
+        givenStreet.add(street[0][0]);
+        givenStreet.add(street[0][1]);
+        givenStreet.add(street[0][2]);
+        givenStreet.add(street[1][0]);
+        givenStreet.add(street[1][1]);
+        givenStreet.add(street[1][2]);
+        givenStreet.add(street[2][0]);
+        givenStreet.add(street[2][1]);
+        givenStreet.add(street[2][2]);
+        return givenStreet;
+
+    }
+
+    private static int getRandomCard() {
+        return (int) (Math.random() * GameData.routeShape.length);
+    }
+
     public Main() {
+        currentCard = GameData.drawCard(GameData.generateDeck());
         startUpScreen = new JPanel();
         display(startUpScreen);
-
     }
 
     public void display(JPanel startUpScreen) {
 
         startUpScreen.setLayout(new GridLayout(5, 2));
         JLabel name = new JLabel("Name : ");
-        JTextField nameField = new JTextField();
+
         JLabel numberOfPlayersLabel = new JLabel("Players : ");
         String[] players = new String[]{"3", "4", "5", "6", "7", "8", "9", "10", "11"};
         numberOfPlayers = new JComboBox(players);
+
 
         OkListener okListener = new OkListener();
         ok.addActionListener(okListener);
@@ -156,7 +125,7 @@ public class Main {
     }
 
     private void createPlayerData(int nofPlayers) {
-
+        //adds a copy of playerDAta to a list of players
         for (int i = 0; i < nofPlayers; i++) {
             playerData.add(new PlayerData());
         }
@@ -164,17 +133,17 @@ public class Main {
 
     private LinkedList<String> identityRoller() {
         LinkedList<String> ids = new LinkedList<String>();
-        ids.add("loyalist");
-        ids.add("loyalist");
-        ids.add("loyalist");
-        ids.add("loyalist");
-        ids.add("activist");
-        ids.add("activist");
-        ids.add("activist");
-        ids.add("activist");
-        ids.add("activist");
-        ids.add("activist");
-        ids.add("activist");
+        ids.add("lojalist");
+        ids.add("lojalist");
+        ids.add("lojalist");
+        ids.add("lojalist");
+        ids.add("aktivist");
+        ids.add("aktivist");
+        ids.add("aktivist");
+        ids.add("aktivist");
+        ids.add("aktivist");
+        ids.add("aktivist");
+        ids.add("aktivist");
         Collections.shuffle(ids);
         return ids;
     }
@@ -184,7 +153,7 @@ public class Main {
 
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == ok) {
-                System.out.println("MSG: reached the button");
+
                 int nofPlayers = numberOfPlayers.getSelectedIndex() + 3;
                 createPlayerData(nofPlayers);
                 LinkedList<String> playerID = identityRoller();
@@ -192,6 +161,7 @@ public class Main {
                     PlayerData pd = playerData.get(i);
                     PlayerData.allegiance = playerID.get(i);
                 }
+                PlayerData.name = nameField.getText();
                 mainFrame.remove(startUpScreen);
                 createGUI();
             }
@@ -200,21 +170,121 @@ public class Main {
         }
 
     }
+    public static class EndListener implements MouseListener{
 
+        public void  mouseClicked(MouseEvent e) {
+            if (e.getSource() == endTurn) {
+
+
+            }
+
+        }
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
+
+    public static class MListener implements MouseListener{
+
+
+        public void  mouseClicked(MouseEvent e) {
+            if(e.getSource()==cardPanel) {
+
+                currentCard = turnCard(currentCard);
+                cardPanel.remove(0);
+                cardPanel.add(drawStreet(currentCard));
+                cardPanel.repaint();
+                mainFrame.pack();
+                cardPanel.setVisible(true);
+
+            }
+            for (int i = 0; i < 45; i++) {
+
+                if (e.getComponent() == cityStreets[i] &&
+                        clickable
+                        ) {
+
+                    cityStreets[i].remove(0);
+                    cityStreets[i].add(drawStreet(currentCard));
+                    board.repaint();
+                    mainFrame.pack();
+                    cityStreets[i].setVisible(true);
+                    //currentCard = null;
+                    clickable = false;
+                    break;
+                }
+            }
+        }
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
     public static void createGUI() {
         //main
         JPanel mainPanel = new JPanel(new BorderLayout());
         //board
-        JPanel board = new JPanel(new GridLayout(5, 9));
-        for (int x = 0; x < 9; x++) {
-            for (int y = 0; y < 5; y++) {
-                board.add(cityStreets[x][y]);
-                board.setVisible(true);
+        board = new JPanel(new GridLayout(5, 9));
+        board.setPreferredSize(new Dimension(800, 500));
+
+
+        for (int x = 0; x < 45; x++) {
+            if(x%9==0){
+                JPanel street = drawStreet(GameData.mapPieceHouses);
+                cityStreets[x].remove(0);
+                cityStreets[x].add(street);
+
+            }else{}
+            if(x==18) {
+                JPanel street = drawStreet(GameData.mapPieceStart);
+                cityStreets[x].remove(0);
+                cityStreets[x].add(street);
             }
+            else{
+
+            }
+            MListener el = new MListener();
+            cityStreets[x].addMouseListener(el);
         }
-        board.setPreferredSize(new Dimension(400,300));
+        for (int x = 0; x < 45; x++) {
+            JPanel street = cityStreets[x];
+            board.add(street);
+
+        }board.setVisible(true);
+
+
+
         //data table
-        JPanel data = new JPanel(new GridLayout(2, 8));
+        JPanel data = new JPanel(new GridLayout(4, 2));
+
+        JLabel labelName = new JLabel("NAME: ");
+        JLabel infoName = new JLabel(PlayerData.name);
+        data.add(labelName);
+        data.add(infoName);
+
         JLabel labelSUPPORT = new JLabel("SUPPORT:");
         JLabel infoSupport;
         infoSupport = new JLabel(Integer.toString(PlayerData.supportGained));
@@ -227,33 +297,25 @@ public class Main {
 
         data.add(labelALLEGIANCE);
         data.add(infoALLEGIANCE);
-        /*data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();
-        data.add();*/
+
+        endTurn = new JButton("End Turn");
+        EndListener ml = new EndListener();
+        endTurn.addMouseListener(ml);
+
+
+        JLabel infoCards = new JLabel();
+
+        data.add(infoCards);
+        data.add(endTurn);
+
         //player screen
 
         JPanel playerScreenNorth = new JPanel(new GridLayout(1, 3));
         JPanel playerScreenWest = new JPanel(new GridLayout(3, 1));
-        JPanel playerScreenSouth = new JPanel(new GridLayout(3, 1));
-        JPanel playerScreenEast = new JPanel(new GridLayout(1, 3));
+        JPanel playerScreenSouth = new JPanel(new GridLayout(1, 3));
+        JPanel playerScreenEast = new JPanel(new GridLayout(3, 1));
 
         //boardContents
-        for (int x = 0; x < 9; x++) {
-            for (int y = 0; y < 5; y++) {
-                board.add(cityStreets[x][y]);
-            }
-        }
 
 
         mainFrame.setTitle("Peaceful Power");
@@ -262,7 +324,13 @@ public class Main {
         mainPanel.add(playerScreenNorth, BorderLayout.NORTH);
         mainPanel.add(playerScreenEast, BorderLayout.EAST);
         mainPanel.add(playerScreenWest, BorderLayout.WEST);
+        playerScreenSouth.setPreferredSize(new Dimension(70,120));
         playerScreenSouth.add(data);
+
+        if(currentCard.charAt(0)=='#')cardPanel.add(drawStreet(currentCard));
+        MListener el = new MListener();
+        cardPanel.addMouseListener(el);
+        playerScreenSouth.add(cardPanel);
         mainPanel.add(playerScreenSouth, BorderLayout.SOUTH);
         mainPanel.setVisible(true);
         mainFrame.add(mainPanel);
@@ -271,4 +339,19 @@ public class Main {
         mainFrame.setVisible(true);
     }
 
+
+    public static String turnCard(String card){
+        String twistedCard ="";
+        twistedCard += card.substring(6,7);
+        twistedCard += card.substring(3,4);
+        twistedCard += card.substring(0,1);
+        twistedCard += card.substring(7,8);
+        twistedCard += card.substring(4,5);
+        twistedCard += card.substring(1,2);
+        twistedCard += card.substring(8);
+        twistedCard += card.substring(5,6);
+        twistedCard += card.substring(2,3);
+
+        return twistedCard;
+    }
 }

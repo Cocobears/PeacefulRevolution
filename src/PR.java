@@ -1,14 +1,12 @@
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.util.Collections;
 import java.util.LinkedList;
 
-public class Main  {
+
+public class PR {
 
     public static JPanel startUpScreen;
     static JButton ok = new JButton("OK");
@@ -19,21 +17,50 @@ public class Main  {
     static JPanel[][] cityStreets = new JPanel[9][5];
     static JLabel[][] street = new JLabel[3][3];
 
-    public static void main(String[] args) {
-        for(int x =0;x<9;x++){
-            for(int y =0;y<5;y++){
-                cityStreets[x][y] =  new JPanel();
-                //TODO cityStreets[x][y].add(street)
-            }
-        }
-
-       new Main();
+    public PR() {
+        startUpScreen = new JPanel();
+        display(startUpScreen);
 
     }
 
-    public Main() {
-        startUpScreen = new JPanel();
-        display(startUpScreen);
+    public static void main(String[] args) {
+        //
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 5; y++) {
+                cityStreets[x][y] = new JPanel();
+
+            }
+        }
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 5; y++) {
+                street[0][0] = new JLabel();
+                street[0][1]=new JLabel();
+                street[0][2]=new JLabel();
+                street[1][0]=new JLabel();
+                street[1][1]=new JLabel();
+                street[1][2]=new JLabel();
+                street[2][0]=new JLabel();
+                street[2][1]=new JLabel();
+                street[2][2]=new JLabel();
+
+                cityStreets[x][y].add(street[0][0]);
+                cityStreets[x][y].add(street[0][1]);
+                cityStreets[x][y].add(street[0][2]);
+                cityStreets[x][y].add(street[1][0]);
+                cityStreets[x][y].add(street[1][1]);
+                cityStreets[x][y].add(street[1][2]);
+                cityStreets[x][y].add(street[2][0]);
+                cityStreets[x][y].add(street[2][1]);
+                cityStreets[x][y].add(street[2][2]);
+
+
+            }
+        }
+        //TEST define a street on the map
+        cityStreets[0][0].setPreferredSize(new Dimension(15,15));
+        cityStreets[0][0].getComponent(0).setBackground(Color.black);
+        cityStreets[0][0].setVisible(true);
+        new PR();
 
     }
 
@@ -62,7 +89,7 @@ public class Main  {
 
     }
 
-    private void createPlayerData(int nofPlayers){
+    private void createPlayerData(int nofPlayers) {
 
         for (int i = 0; i < nofPlayers; i++) {
             playerData.add(new PlayerData());
@@ -86,28 +113,6 @@ public class Main  {
         return ids;
     }
 
-    public class OkListener implements ActionListener {
-
-
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource()==ok) {
-                System.out.println("MSG: reached the button");
-                int nofPlayers = numberOfPlayers.getSelectedIndex() + 3;
-                createPlayerData(nofPlayers );
-                LinkedList<String> playerID = identityRoller();
-                for (int i = 0; i < nofPlayers; i++) {
-                    PlayerData pd = playerData.get(i);
-                    pd.allegiance = playerID.get(i);
-                }
-                mainFrame.remove(startUpScreen);
-                createGUI();
-            }
-
-
-        }
-
-    }
-
     public void createGUI() {
         //main
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -123,16 +128,16 @@ public class Main  {
         JPanel playerScreenEast = new JPanel(new GridLayout(1, 3));
 
         //boardContents
-        for(int x =0;x<9;x++){
-            for(int y =0;y<5;y++){
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 5; y++) {
                 board.add(cityStreets[x][y]);
             }
         }
         mainFrame.setTitle("Peaceful Power");
-        mainPanel.setSize(800, 640);
+        mainPanel.setPreferredSize(new Dimension(800, 640));
         mainPanel.add(board, BorderLayout.CENTER);
         mainPanel.add(playerScreenNorth, BorderLayout.NORTH);
-        mainPanel.add(playerScreenEast, BorderLayout.EAST );
+        mainPanel.add(playerScreenEast, BorderLayout.EAST);
         mainPanel.add(playerScreenWest, BorderLayout.WEST);
         playerScreenSouth.add(data);
         mainPanel.add(playerScreenSouth, BorderLayout.SOUTH);
@@ -141,5 +146,27 @@ public class Main  {
         mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         mainFrame.pack();
         mainFrame.setVisible(true);
+    }
+
+    public class OkListener implements ActionListener {
+
+
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == ok) {
+                System.out.println("MSG: reached the button");
+                int nofPlayers = numberOfPlayers.getSelectedIndex() + 3;
+                createPlayerData(nofPlayers);
+                LinkedList<String> playerID = identityRoller();
+                for (int i = 0; i < nofPlayers; i++) {
+                    PlayerData pd = playerData.get(i);
+                    pd.allegiance = playerID.get(i);
+                }
+                mainFrame.remove(startUpScreen);
+                createGUI();
+            }
+
+
+        }
+
     }
 }
