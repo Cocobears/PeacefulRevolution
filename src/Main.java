@@ -15,19 +15,19 @@ public class Main {
     static JButton ok = new JButton("OK");
     static LinkedList<String> identities;
     static JComboBox numberOfPlayers = new JComboBox();
-    static LinkedList<PlayerData> playerData = new LinkedList<PlayerData>();
+    static LinkedList<PlayerData> players = new LinkedList<PlayerData>();
     static JFrame mainFrame = new JFrame();
     static JPanel[] cityStreets = new JPanel[45];
     static JLabel[][] street = new JLabel[3][3];
     static JTextField nameField = new JTextField();
     static JPanel cardPanel = new JPanel();
-    static String currentCard ;
+    static String currentCard;
     static JPanel board = new JPanel(new GridLayout(5, 9));
     static JPanel data;
     static boolean clickable = true;
     static JButton endTurn;
-    static LinkedList<String>  currentHand = new LinkedList<String>();
-    static LinkedList<String>  deck = GameData.generateDeck();
+    static LinkedList<String> currentHand = new LinkedList<String>();
+    static LinkedList<String> deck = GameData.generateDeck();
     static LinkedList<String> currentTechHand = new LinkedList<String>();
     static JButton infoCards;
 
@@ -37,7 +37,7 @@ public class Main {
 
         for (int x = 0; x < 45; x++) {
 
-             cityStreets[x] = new JPanel();
+            cityStreets[x] = new JPanel();
 
         }
         //create the streets as a test
@@ -64,11 +64,11 @@ public class Main {
         Color n;
         JLabel[][] street = new JLabel[3][3];
 
-        for(int x = 0;x<3;x++){
-            for(int y = 0; y< 3;y++){
-                int stringIndex = x*3+y;
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                int stringIndex = x * 3 + y;
                 street[x][y] = new JLabel();
-                if(s.charAt(0)=='#') {//if it is a mappiece
+                if (s.charAt(0) == '#') {//if it is a mappiece
                     if (s.charAt(stringIndex) == (' ')) n = Color.BLACK;
                     else {
                         n = Color.red;
@@ -111,7 +111,7 @@ public class Main {
         JLabel name = new JLabel("Name : ");
 
         JLabel numberOfPlayersLabel = new JLabel("Players : ");
-        String[] players = new String[]{"3", "4", "5", "6", "7", "8", "9", "10", "11"};
+        String[] players = new String[]{"3", "4", "5", "6", "7", "8", "9", "10"};
         numberOfPlayers = new JComboBox(players);
 
 
@@ -134,7 +134,7 @@ public class Main {
     private static void createPlayerData(int nofPlayers) {
         //adds a copy of playerDAta to a list of players
         for (int i = 0; i < nofPlayers; i++) {
-            playerData.add(new PlayerData());
+            players.add(new PlayerData());
         }
     }
 
@@ -165,14 +165,14 @@ public class Main {
                 createPlayerData(nofPlayers);
                 LinkedList<String> playerID = identityRoller();
                 for (int i = 0; i < nofPlayers; i++) {
-                    PlayerData pd = playerData.get(i);
+                    PlayerData pd = players.get(i);
                     PlayerData.allegiance = playerID.get(i);
                 }
                 PlayerData.name = nameField.getText();
                 mainFrame.remove(startUpScreen);
                 createGUI();
             }
-            if(e.getSource() == infoCards){
+            if (e.getSource() == infoCards) {
                 //presents a selection of cards and then a selection of opposing players
 
             }
@@ -180,13 +180,14 @@ public class Main {
         }
 
     }
-    public static class EndListener implements MouseListener{
 
-        public void  mouseClicked(MouseEvent e) {
+    public static class EndListener implements MouseListener {
+
+        public void mouseClicked(MouseEvent e) {
             if (e.getSource() == endTurn) {
                 clickable = true;
                 currentCard = GameData.drawCard(deck);
-                if(currentCard.charAt(0)!='#') {
+                if (currentCard.charAt(0) != '#') {
                     currentTechHand.add(currentCard.substring(0, 1));
                     infoCards.setText(currentTechHand.toString());
                 }
@@ -200,6 +201,7 @@ public class Main {
             }
 
         }
+
         public void mousePressed(MouseEvent e) {
 
         }
@@ -217,11 +219,11 @@ public class Main {
         }
     }
 
-    public static class MListener implements MouseListener{
+    public static class MListener implements MouseListener {
 
 
-        public void  mouseClicked(MouseEvent e) {
-            if(e.getSource()==cardPanel) {
+        public void mouseClicked(MouseEvent e) {
+            if (e.getSource() == cardPanel) {
 
                 currentCard = turnCard(currentCard);
                 cardPanel.remove(0);
@@ -248,6 +250,7 @@ public class Main {
                 }
             }
         }
+
         public void mousePressed(MouseEvent e) {
 
         }
@@ -264,6 +267,7 @@ public class Main {
 
         }
     }
+
     public static void createGUI() {
         //main
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -273,29 +277,47 @@ public class Main {
 
 
         for (int x = 0; x < 45; x++) {
-            if(x%9==0){
+            //first row
+            if (x % 9 == 0) {
                 JPanel street = drawStreet(GameData.mapPieceHouses);
-                cityStreets[x].remove(0);
+                cityStreets[x].removeAll();
                 cityStreets[x].add(street);
 
-            }else{}
-            if(x==18) {
+            } else {
+            }
+            //add start
+            if (x == 18) {
                 JPanel street = drawStreet(GameData.mapPieceStart);
-                cityStreets[x].remove(0);
+                cityStreets[x].removeAll();
                 cityStreets[x].add(street);
+            } else {
             }
-            else{
+            //last row
+            if (x == 8) {
+               JPanel street = drawStreet(GameData.mapPiecePalace);
+                cityStreets[x].removeAll();
+                cityStreets[x].add(street);
+            }else{}
+            if (x == 26){
+                JPanel street = drawStreet(GameData.mapPiecePalace);
+                cityStreets[x].removeAll();
+                cityStreets[x].add(street);
+            }else{}
+            if(x == 44){
+                JPanel street = drawStreet(GameData.mapPiecePalace);
+                cityStreets[x].removeAll();
+                cityStreets[x].add(street);
+            }else{}
 
-            }
             MListener el = new MListener();
             cityStreets[x].addMouseListener(el);
         }
         for (int x = 0; x < 45; x++) {
             JPanel street = cityStreets[x];
             board.add(street);
+        }
 
-        }board.setVisible(true);
-
+        board.setVisible(true);
 
 
         //data table
@@ -335,7 +357,7 @@ public class Main {
         JPanel playerScreenSouth = new JPanel(new GridLayout(1, 3));
         JPanel playerScreenEast = new JPanel(new GridLayout(3, 1));
 
-        //boardContents
+        //mainFrame is set
 
 
         mainFrame.setTitle("Peaceful Power");
@@ -344,14 +366,13 @@ public class Main {
         mainPanel.add(playerScreenNorth, BorderLayout.NORTH);
         mainPanel.add(playerScreenEast, BorderLayout.EAST);
         mainPanel.add(playerScreenWest, BorderLayout.WEST);
-        playerScreenSouth.setPreferredSize(new Dimension(70,120));
+        playerScreenSouth.setPreferredSize(new Dimension(70, 120));
         playerScreenSouth.add(data);
 
-        if(currentCard.charAt(0)=='#') {
+        if (currentCard.charAt(0) == '#') {
             cardPanel.add(drawStreet(currentCard));
-        }
-        else{
-            PlayerData.techHand.add(currentCard.substring(0,1));
+        } else {
+            PlayerData.techHand.add(currentCard.substring(0, 1));
             infoCards.setText(PlayerData.techHand.toString());
         }
         MListener el = new MListener();
@@ -366,17 +387,17 @@ public class Main {
     }
 
 
-    public static String turnCard(String card){
-        String twistedCard ="";
-        twistedCard += card.substring(6,7);
-        twistedCard += card.substring(3,4);
-        twistedCard += card.substring(0,1);
-        twistedCard += card.substring(7,8);
-        twistedCard += card.substring(4,5);
-        twistedCard += card.substring(1,2);
+    public static String turnCard(String card) {
+        String twistedCard = "";
+        twistedCard += card.substring(6, 7);
+        twistedCard += card.substring(3, 4);
+        twistedCard += card.substring(0, 1);
+        twistedCard += card.substring(7, 8);
+        twistedCard += card.substring(4, 5);
+        twistedCard += card.substring(1, 2);
         twistedCard += card.substring(8);
-        twistedCard += card.substring(5,6);
-        twistedCard += card.substring(2,3);
+        twistedCard += card.substring(5, 6);
+        twistedCard += card.substring(2, 3);
 
         return twistedCard;
     }

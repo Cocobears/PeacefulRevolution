@@ -5,8 +5,18 @@ import java.util.LinkedList;
  * Created by muse on 27-Sep-15.
  */
 public class GameData {
+    final static String side[] = {"loyalist", "activist"};
 
-    static int currentPlayer =0;
+    final static int[] supportCardsForWinners = {3,4,5,6,7,8,9,9};
+
+    final static int[] nofActivists = {3,4,4,5,5,6,7,7};
+    final static int[] nofLoyalists = {1,1,2,2,3,3,3,4};
+
+    static boolean deckDepleted = false;
+
+    static boolean routeExists = false;
+
+    static int currentPlayer = 0;
     //MAP bits
     static String mapPiece4Exits = "# #   # #";
 
@@ -110,6 +120,57 @@ public class GameData {
             "police&lawyer"
 
     };
+    public static String[] boardMap = {
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+
+            "",
+            "",
+            "",
+            "",
+            ""
+    };
 
     public static int getCurrentPlayer() {
 
@@ -142,5 +203,25 @@ public class GameData {
         String topCard = deck.getFirst();
         deck.removeFirst();
         return topCard;
+    }
+    public static LinkedList<PlayerData> activistsList(LinkedList<PlayerData> p){
+        LinkedList<PlayerData> activists = new LinkedList<PlayerData>();
+        for (int i = 0; i < p.size(); i++) {
+            if(p.get(i).allegiance.equals("activist")){
+                activists.add(p.get(i));
+            }
+        }
+
+        return activists;
+    }
+    public static LinkedList<PlayerData> loyaliststsList(LinkedList<PlayerData> p){
+        LinkedList<PlayerData> loyalists = new LinkedList<PlayerData>();
+        for (int i = 0; i < p.size(); i++) {
+            if(p.get(i).allegiance.equals("loyalist")){
+                loyalists.add(p.get(i));
+            }
+        }
+
+        return loyalists;
     }
 }
