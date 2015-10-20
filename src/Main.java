@@ -23,8 +23,14 @@ public class Main {
     static JPanel cardPanel = new JPanel();
     static String currentCard ;
     static JPanel board = new JPanel(new GridLayout(5, 9));
-    static boolean clickable =true;
+    static JPanel data;
+    static boolean clickable = true;
     static JButton endTurn;
+    static LinkedList<String>  currentHand = new LinkedList<String>();
+    static LinkedList<String>  deck = GameData.generateDeck();
+    static LinkedList<String> currentTechHand = new LinkedList<String>();
+    static JButton infoCards;
+
     public static void main(String[] args) {
         GameData game = new GameData();
         //define panels for the citymap
@@ -93,7 +99,8 @@ public class Main {
     }
 
     public Main() {
-        currentCard = GameData.drawCard(GameData.generateDeck());
+        deck = GameData.generateDeck();
+        currentCard = GameData.drawCard(deck);
         startUpScreen = new JPanel();
         display(startUpScreen);
     }
@@ -124,14 +131,14 @@ public class Main {
 
     }
 
-    private void createPlayerData(int nofPlayers) {
+    private static void createPlayerData(int nofPlayers) {
         //adds a copy of playerDAta to a list of players
         for (int i = 0; i < nofPlayers; i++) {
             playerData.add(new PlayerData());
         }
     }
 
-    private LinkedList<String> identityRoller() {
+    private static LinkedList<String> identityRoller() {
         LinkedList<String> ids = new LinkedList<String>();
         ids.add("lojalist");
         ids.add("lojalist");
@@ -148,7 +155,7 @@ public class Main {
         return ids;
     }
 
-    public class OkListener implements ActionListener {
+    public static class OkListener implements ActionListener {
 
 
         public void actionPerformed(ActionEvent e) {
@@ -165,7 +172,10 @@ public class Main {
                 mainFrame.remove(startUpScreen);
                 createGUI();
             }
+            if(e.getSource() == infoCards){
+                //presents a selection of cards and then a selection of opposing players
 
+            }
 
         }
 
@@ -174,8 +184,19 @@ public class Main {
 
         public void  mouseClicked(MouseEvent e) {
             if (e.getSource() == endTurn) {
+                clickable = true;
+                currentCard = GameData.drawCard(deck);
+                if(currentCard.charAt(0)!='#') {
+                    currentTechHand.add(currentCard.substring(0, 1));
+                    infoCards.setText(currentTechHand.toString());
+                }
+                //new card
 
-
+                cardPanel.removeAll();
+                cardPanel.add(drawStreet(currentCard));
+                cardPanel.repaint();
+                mainFrame.pack();
+                cardPanel.setVisible(true);
             }
 
         }
@@ -215,8 +236,8 @@ public class Main {
                 if (e.getComponent() == cityStreets[i] &&
                         clickable
                         ) {
-
-                    cityStreets[i].remove(0);
+                    cardPanel.setVisible(false);
+                    cityStreets[i].removeAll();
                     cityStreets[i].add(drawStreet(currentCard));
                     board.repaint();
                     mainFrame.pack();
@@ -278,7 +299,7 @@ public class Main {
 
 
         //data table
-        JPanel data = new JPanel(new GridLayout(4, 2));
+        data = new JPanel(new GridLayout(4, 2));
 
         JLabel labelName = new JLabel("NAME: ");
         JLabel infoName = new JLabel(PlayerData.name);
@@ -294,7 +315,6 @@ public class Main {
         JLabel labelALLEGIANCE = new JLabel("ALLEGIANCE:");
         JLabel infoALLEGIANCE = new JLabel(PlayerData.allegiance);
 
-
         data.add(labelALLEGIANCE);
         data.add(infoALLEGIANCE);
 
@@ -302,9 +322,9 @@ public class Main {
         EndListener ml = new EndListener();
         endTurn.addMouseListener(ml);
 
-
-        JLabel infoCards = new JLabel();
-
+        infoCards = new JButton();
+        OkListener icl = new OkListener();
+        infoCards.addActionListener(icl);
         data.add(infoCards);
         data.add(endTurn);
 
@@ -327,7 +347,13 @@ public class Main {
         playerScreenSouth.setPreferredSize(new Dimension(70,120));
         playerScreenSouth.add(data);
 
-        if(currentCard.charAt(0)=='#')cardPanel.add(drawStreet(currentCard));
+        if(currentCard.charAt(0)=='#') {
+            cardPanel.add(drawStreet(currentCard));
+        }
+        else{
+            PlayerData.techHand.add(currentCard.substring(0,1));
+            infoCards.setText(PlayerData.techHand.toString());
+        }
         MListener el = new MListener();
         cardPanel.addMouseListener(el);
         playerScreenSouth.add(cardPanel);

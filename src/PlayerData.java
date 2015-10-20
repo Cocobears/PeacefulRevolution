@@ -7,7 +7,7 @@ public class PlayerData {
     static String allegiance = "";
     static String name = "";
     static int supportGained = 0;
-    static LinkedList<String> cardListTech = new LinkedList<String>();
+    static LinkedList<String> techHand = new LinkedList<String>();
     static LinkedList<String> hand =  new LinkedList<String>();
     int id = 0;
 
