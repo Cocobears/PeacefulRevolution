@@ -12,14 +12,21 @@ import java.util.LinkedList;
 public class Main {
 
     public static JPanel startUpScreen;
+    static JTextField nameField = new JTextField();
     static JButton ok = new JButton("OK");
+
     static LinkedList<String> identities;
     static JComboBox numberOfPlayers = new JComboBox();
-    static LinkedList<PlayerData> players = new LinkedList<PlayerData>();
+    static int nofPlayers = 3;
+    static LinkedList<PlayerData> players;
+    private static String name;
+    public static String[] map;
+    String[] playernames;
     static JFrame mainFrame = new JFrame();
-    static JPanel[] cityStreets = new JPanel[45];
+    static JPanel[] cityStreets = new JPanel[9*5];
     static JLabel[][] street = new JLabel[3][3];
-    static JTextField nameField = new JTextField();
+
+
     static JPanel cardPanel = new JPanel();
     static String currentCard;
     static JPanel board = new JPanel(new GridLayout(5, 9));
@@ -30,32 +37,14 @@ public class Main {
     static LinkedList<String> deck = GameData.generateDeck();
     static LinkedList<String> currentTechHand = new LinkedList<String>();
     static JButton infoCards;
+    static int winnerID = -1;
+    private final int nofRounds = 3;
 
     public static void main(String[] args) {
         GameData game = new GameData();
         //define panels for the citymap
 
-        for (int x = 0; x < 45; x++) {
 
-            cityStreets[x] = new JPanel();
-
-        }
-        //create the streets as a test
-        //setup the streets
-        int cardValue = -1;
-        int index = 0;
-        for (int x = 0; x < 45; x++) {
-
-            Color n;
-            //
-
-            System.out.println(cardValue);
-            cardValue = getRandomCard();
-            JPanel givenStreet = drawStreet(GameData.routeShape[cardValue]);
-            //cityStreets[x][y].setLocation(35*x,35*y);
-            cityStreets[x].add(givenStreet);
-
-        }
         new Main();
 
     }
@@ -70,6 +59,9 @@ public class Main {
                 street[x][y] = new JLabel();
                 if (s.charAt(0) == '#') {//if it is a mappiece
                     if (s.charAt(stringIndex) == (' ')) n = Color.BLACK;
+                    else if (s.charAt(stringIndex) == ('H'))n = Color.gray;
+                    else if (s.charAt(stringIndex) == ('¤'))n =  Color.white;
+                    else if (s.charAt(stringIndex) == ('P'))n =  Color.yellow;
                     else {
                         n = Color.red;
                     }
@@ -98,13 +90,6 @@ public class Main {
         return (int) (Math.random() * GameData.routeShape.length);
     }
 
-    public Main() {
-        deck = GameData.generateDeck();
-        currentCard = GameData.drawCard(deck);
-        startUpScreen = new JPanel();
-        display(startUpScreen);
-    }
-
     public void display(JPanel startUpScreen) {
 
         startUpScreen.setLayout(new GridLayout(5, 2));
@@ -131,29 +116,101 @@ public class Main {
 
     }
 
-    private static void createPlayerData(int nofPlayers) {
-        //adds a copy of playerDAta to a list of players
+    public Main() {
+        //initial
+        deck = GameData.generateDeck();
+        currentCard = GameData.drawCard(deck);
+        startUpScreen = new JPanel();
+        display(startUpScreen);
+        players = createPlayerData(nofPlayers);
+        Model gameMechanics = new Model();
+        ///////////////////////
+        //game routine
+        //////////////////////
+        for (int i = 0; i < nofRounds; i++) {
+            do {
+                //game play
+
+            } while (isEndOfRound());
+            gameMechanics.distributeBounty();
+        }
+        //find the winner of the games
+        int max = 0;
         for (int i = 0; i < nofPlayers; i++) {
-            players.add(new PlayerData());
+            if(max<players.get(i).supportGained){
+                max = players.get(i).supportGained;
+            }
+        }
+        //VICTORY MESSAGE
+        data.removeAll();
+        JLabel victoryMessage =  new JLabel();
+
+        data.add(victoryMessage);
+        for (int i =0 ; i< nofPlayers;i++) {
+            if(players.get(i).supportGained == max)victoryMessage.setText("Winner: " + players.get(i).name);
+
         }
     }
 
-    private static LinkedList<String> identityRoller() {
-        LinkedList<String> ids = new LinkedList<String>();
-        ids.add("lojalist");
-        ids.add("lojalist");
-        ids.add("lojalist");
-        ids.add("lojalist");
-        ids.add("aktivist");
-        ids.add("aktivist");
-        ids.add("aktivist");
-        ids.add("aktivist");
-        ids.add("aktivist");
-        ids.add("aktivist");
-        ids.add("aktivist");
-        Collections.shuffle(ids);
-        return ids;
+    private boolean isEndOfRound() {
+        boolean b = true;
+        if(GameData.deckDepleted && isAllPassing()){
+            //loyalists win
+            b = false;
+        }else{}
+        if (Model.isCompletedRoute()){}else{}
+        return b;
     }
+
+    private boolean isAllPassing() {
+        boolean b = false;
+        boolean passingToken = true;
+        for (int i = 0; i < nofPlayers; i++) {
+            passingToken = passingToken && players.get(i).pass;
+        }
+        b = passingToken;
+        return b;
+    }
+
+
+
+
+
+    private static LinkedList<PlayerData> createPlayerData(int nofPlayers) {
+        //adds a copy of playerDAta to a list of players
+        players = new LinkedList<PlayerData>();
+        for (int i = 0; i < GameData.numberOfPlayers; i++) {
+            PlayerData n = new PlayerData();
+            players.add(n);
+        }
+
+        players.get(0).name = name;
+        //set allegiance
+        LinkedList allegianceDeck = setAllegianceDeck();
+        for (int i = 0; i < nofPlayers; i++) {
+            players.get(i).allegiance = (String) allegianceDeck.getFirst();
+            allegianceDeck.removeFirst();
+        }
+        //
+        for (int i = 0; i < nofPlayers; i++) {
+            players.get(i).id = i;
+        }
+        return players;
+    }
+
+    private static LinkedList setAllegianceDeck() {
+        LinkedList allegianceDeck = new LinkedList();
+        for (int i = 0; i < GameData.nofActivists[Main.nofPlayers]; i++) {
+            allegianceDeck.add("activist");
+        }
+        for (int i = 0; i < GameData.nofLoyalists[Main.nofPlayers]; i++) {
+            allegianceDeck.add("loyalist");
+        }
+        Collections.shuffle(allegianceDeck);
+        return allegianceDeck;
+    }
+
+
 
     public static class OkListener implements ActionListener {
 
@@ -161,19 +218,20 @@ public class Main {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == ok) {
 
-                int nofPlayers = numberOfPlayers.getSelectedIndex() + 3;
-                createPlayerData(nofPlayers);
-                LinkedList<String> playerID = identityRoller();
-                for (int i = 0; i < nofPlayers; i++) {
-                    PlayerData pd = players.get(i);
-                    PlayerData.allegiance = playerID.get(i);
-                }
-                PlayerData.name = nameField.getText();
+                nofPlayers = numberOfPlayers.getSelectedIndex() + 3;
+                GameData.numberOfPlayers = nofPlayers;
+                name = nameField.getText();
                 mainFrame.remove(startUpScreen);
                 createGUI();
             }
             if (e.getSource() == infoCards) {
                 //presents a selection of cards and then a selection of opposing players
+                JFrame optionsFrame = new JFrame();
+                //contents for options frame
+                JComboBox<String> players = new JComboBox<String>();
+                
+                optionsFrame.pack();
+                optionsFrame.setVisible(true);
 
             }
 
@@ -275,6 +333,28 @@ public class Main {
         board = new JPanel(new GridLayout(5, 9));
         board.setPreferredSize(new Dimension(800, 500));
 
+        //contents of the board
+        for (int x = 0; x < 45; x++) {
+
+            cityStreets[x] = new JPanel();
+
+        }
+        //create the streets as a test
+        //setup the streets
+        int cardValue = -1;
+        int index = 0;
+        for (int x = 0; x < 45; x++) {
+
+            Color n;
+            //
+
+            System.out.println(cardValue);
+            cardValue = getRandomCard();
+            JPanel givenStreet = drawStreet(GameData.routeShape[cardValue]);
+
+            cityStreets[x].add(givenStreet);
+
+        }
 
         for (int x = 0; x < 45; x++) {
             //first row
@@ -286,24 +366,24 @@ public class Main {
             } else {
             }
             //add start
-            if (x == 18) {
+            if (x == (9+9)-1+1) {
                 JPanel street = drawStreet(GameData.mapPieceStart);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
             } else {
             }
             //last row
-            if (x == 8) {
+            if (x == 9-1) {
                JPanel street = drawStreet(GameData.mapPiecePalace);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
             }else{}
-            if (x == 26){
+            if (x == 3*9-1){
                 JPanel street = drawStreet(GameData.mapPiecePalace);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
             }else{}
-            if(x == 44){
+            if(x == 5*9 -1){
                 JPanel street = drawStreet(GameData.mapPiecePalace);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
@@ -312,7 +392,7 @@ public class Main {
             MListener el = new MListener();
             cityStreets[x].addMouseListener(el);
         }
-        for (int x = 0; x < 45; x++) {
+        for (int x = 0; x < 9*5; x++) {
             JPanel street = cityStreets[x];
             board.add(street);
         }
@@ -324,18 +404,18 @@ public class Main {
         data = new JPanel(new GridLayout(4, 2));
 
         JLabel labelName = new JLabel("NAME: ");
-        JLabel infoName = new JLabel(PlayerData.name);
+        JLabel infoName = new JLabel(name);
         data.add(labelName);
         data.add(infoName);
 
         JLabel labelSUPPORT = new JLabel("SUPPORT:");
         JLabel infoSupport;
-        infoSupport = new JLabel(Integer.toString(PlayerData.supportGained));
+        infoSupport = new JLabel(Integer.toString(players.get(0).supportGained));
         data.add(labelSUPPORT);
         data.add(infoSupport);
 
         JLabel labelALLEGIANCE = new JLabel("ALLEGIANCE:");
-        JLabel infoALLEGIANCE = new JLabel(PlayerData.allegiance);
+        JLabel infoALLEGIANCE = new JLabel(players.get(0).allegiance);
 
         data.add(labelALLEGIANCE);
         data.add(infoALLEGIANCE);
@@ -368,17 +448,18 @@ public class Main {
         mainPanel.add(playerScreenWest, BorderLayout.WEST);
         playerScreenSouth.setPreferredSize(new Dimension(70, 120));
         playerScreenSouth.add(data);
-
+        //Current Card Panel
         if (currentCard.charAt(0) == '#') {
             cardPanel.add(drawStreet(currentCard));
         } else {
-            PlayerData.techHand.add(currentCard.substring(0, 1));
-            infoCards.setText(PlayerData.techHand.toString());
+            players.get(0).techHand.add(currentCard.substring(0, 1));
+            infoCards.setText(players.get(0).techHand.toString());
         }
         MListener el = new MListener();
         cardPanel.addMouseListener(el);
         playerScreenSouth.add(cardPanel);
         mainPanel.add(playerScreenSouth, BorderLayout.SOUTH);
+
         mainPanel.setVisible(true);
         mainFrame.add(mainPanel);
         mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

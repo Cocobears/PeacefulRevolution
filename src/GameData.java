@@ -8,16 +8,20 @@ public class GameData {
     final static String side[] = {"loyalist", "activist"};
 
     final static int[] supportCardsForWinners = {3,4,5,6,7,8,9,9};
+    static String[] supportCard = {"1","1","1","1", "1","1","1","1", "1","1","1","1", "1","1","1","1", "2","2","2","2", "2","2","2","2", "3","3","3","3"};
+    static LinkedList<String> supportBounty = new LinkedList<String>();
 
     final static int[] nofActivists = {3,4,4,5,5,6,7,7};
     final static int[] nofLoyalists = {1,1,2,2,3,3,3,4};
-
+    static int numberOfPlayers = 3;
     static boolean deckDepleted = false;
 
     static boolean routeExists = false;
 
     static int currentPlayer = 0;
     //MAP bits
+    static String mapPieceHIDDEN = "HHHHHHHHH";
+
     static String mapPiece4Exits = "# #   # #";
 
     static String mapPiece3Exits = "#»#   # #";
@@ -117,59 +121,17 @@ public class GameData {
             "lawyer",
             "reporter&police",
             "lawyer&reporter",
-            "police&lawyer"
+            "police&lawyer",
+            //
+            "burnt house",
+            "burnt house",
+            "burnt house",
+            //hint
+            "hint",
+            "hint",
+            "hint",
+            "hint"
 
-    };
-    public static String[] boardMap = {
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-
-            "",
-            "",
-            "",
-            "",
-            ""
     };
 
     public static int getCurrentPlayer() {
@@ -178,13 +140,20 @@ public class GameData {
     }
 
     public static int nextPlayer(){
-        currentPlayer++;
+        if(currentPlayer < numberOfPlayers)currentPlayer++;
+        else {currentPlayer = 0;}
         return getCurrentPlayer();
     }
 
     public GameData() {
         LinkedList<String> deck = new LinkedList<String>();
         deck = generateDeck();
+
+        for(int i =0;i < supportCard.length;i++)
+        {
+            supportBounty.add(supportCard[i]);
+        }
+        Collections.shuffle(supportBounty);
     }
 
     public static LinkedList<String> generateDeck() {
