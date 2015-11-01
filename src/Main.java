@@ -20,7 +20,8 @@ public class Main {
     static int nofPlayers = 3;
     static LinkedList<PlayerData> players;
     private static String name;
-    public static String[] map;
+    public static String[] map = new String[45];
+    private final int presidentsLocation;
     String[] playernames;
     static JFrame mainFrame = new JFrame();
     static JPanel[] cityStreets = new JPanel[9*5];
@@ -40,9 +41,10 @@ public class Main {
     static int winnerID = -1;
     private final int nofRounds = 3;
 
+    static Model modelOfGame = new Model();
     public static void main(String[] args) {
-        GameData game = new GameData();
-        //define panels for the citymap
+
+
 
 
         new Main();
@@ -118,26 +120,36 @@ public class Main {
 
     public Main() {
         //initial
+        for (int i = 0; i < 45; i++) {
+            map[i] = "         ";
+        }
+        // GameData game = new GameData();
         deck = GameData.generateDeck();
         currentCard = GameData.drawCard(deck);
         startUpScreen = new JPanel();
-        display(startUpScreen);
+        display(startUpScreen);//also runs the mainFrame once startupscreen completes
         players = createPlayerData(nofPlayers);
+        presidentsLocation = 1+2*(int)(Math.random()*3);
+        System.out.println("presidentsLocation :" + presidentsLocation );
         Model gameMechanics = new Model();
         ///////////////////////
         //game routine
         //////////////////////
         for (int i = 0; i < nofRounds; i++) {
             do {
-                //game play
-
+                //game play in single player mode
+                for(PlayerData p : players){
+                    //setData()
+                }
+                //gameplay in multiplayer mode
+                //
             } while (isEndOfRound());
             gameMechanics.distributeBounty();
         }
-        //find the winner of the games
+        //find the winner of the 3 game rounds
         int max = 0;
         for (int i = 0; i < nofPlayers; i++) {
-            if(max<players.get(i).supportGained){
+            if(max<players.get(i).supportGained) {
                 max = players.get(i).supportGained;
             }
         }
@@ -158,7 +170,7 @@ public class Main {
             //loyalists win
             b = false;
         }else{}
-        if (Model.isCompletedRoute()){}else{}
+
         return b;
     }
 
@@ -171,7 +183,6 @@ public class Main {
         b = passingToken;
         return b;
     }
-
 
 
 
@@ -198,8 +209,16 @@ public class Main {
         return players;
     }
 
+    private static LinkedList<PlayerData> getPlayerDataFromServer(){
+        //check that the server exists
+        //connect to server
+        //get the data as a BufferedStream?/String
+        //add all the data substrings to PlayerData LinkedList
+        return null;
+    }
+
     private static LinkedList setAllegianceDeck() {
-        LinkedList allegianceDeck = new LinkedList();
+        LinkedList<String> allegianceDeck = new LinkedList();
         for (int i = 0; i < GameData.nofActivists[Main.nofPlayers]; i++) {
             allegianceDeck.add("activist");
         }
@@ -215,6 +234,8 @@ public class Main {
     public static class OkListener implements ActionListener {
 
 
+        private JFrame optionsFrame  = new JFrame();;
+
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == ok) {
 
@@ -224,17 +245,41 @@ public class Main {
                 mainFrame.remove(startUpScreen);
                 createGUI();
             }
+            JButton command = null;
             if (e.getSource() == infoCards) {
                 //presents a selection of cards and then a selection of opposing players
-                JFrame optionsFrame = new JFrame();
+
+                optionsFrame.setPreferredSize(new Dimension(200, 300));
+                optionsFrame.setLayout(new GridLayout(3, 1));
                 //contents for options frame
-                JComboBox<String> players = new JComboBox<String>();
-                
+                command = new JButton("Make it so!");
+                OkListener cl = new OkListener();
+                command.addActionListener(cl);
+
+                String[] playerNames = new String[nofPlayers];
+                int i = 0;
+                for (PlayerData p : players) {
+                    playerNames[i] = p.name;
+                }
+
+                JComboBox<String> techCardToPlay = new JComboBox<String>(
+                        currentTechHand.toArray(new String[currentTechHand.size()]));
+                JComboBox<String> playersList = new JComboBox<String>(playerNames);//later limit it to a selection based
+                // on the current selected tech card
+
+
+                //the targeted player
+                optionsFrame.add(playersList);
+                optionsFrame.add(techCardToPlay);
+                optionsFrame.add(command);
                 optionsFrame.pack();
                 optionsFrame.setVisible(true);
 
             }
+            if (e.getSource() == command) {
 
+                //optionsFrame.dispose();
+            }
         }
 
     }
@@ -294,11 +339,13 @@ public class Main {
             for (int i = 0; i < 45; i++) {
 
                 if (e.getComponent() == cityStreets[i] &&
-                        clickable
+                        clickable && //make sure there is only one effective click
+                        map[i].equals("         ") //checks that there are no existing mappieces
                         ) {
                     cardPanel.setVisible(false);
                     cityStreets[i].removeAll();
                     cityStreets[i].add(drawStreet(currentCard));
+                    map[i] = currentCard;//add currentcard to map
                     board.repaint();
                     mainFrame.pack();
                     cityStreets[i].setVisible(true);
@@ -306,7 +353,25 @@ public class Main {
                     clickable = false;
                     break;
                 }
+                nearPalace(i);
             }
+        }
+
+        private void nearPalace(int i) {
+            if (    i == 7 ||
+                    i == 25||
+                    i == 43||
+                    i == 17||
+                    i == 36){
+                System.out.println("checking for possiblity of a win");
+                if(isRouteComplete()){
+                    System.out.println("You won!");
+                }
+            }
+        }
+
+        private boolean isRouteComplete() {
+                    return modelOfGame.isCompletedRoute();
         }
 
         public void mousePressed(MouseEvent e) {
@@ -344,16 +409,8 @@ public class Main {
         int cardValue = -1;
         int index = 0;
         for (int x = 0; x < 45; x++) {
-
-            Color n;
-            //
-
-            System.out.println(cardValue);
-            cardValue = getRandomCard();
-            JPanel givenStreet = drawStreet(GameData.routeShape[cardValue]);
-
+            JPanel givenStreet = drawStreet(GameData.mapPieceHIDDEN);
             cityStreets[x].add(givenStreet);
-
         }
 
         for (int x = 0; x < 45; x++) {
@@ -392,6 +449,8 @@ public class Main {
             MListener el = new MListener();
             cityStreets[x].addMouseListener(el);
         }
+
+        //ADD ALL CITYSTREETS TO THE BOARD
         for (int x = 0; x < 9*5; x++) {
             JPanel street = cityStreets[x];
             board.add(street);

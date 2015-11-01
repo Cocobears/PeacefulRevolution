@@ -118,8 +118,9 @@ public class Model {
 
     }
 
-    public static boolean isCompletedRoute() {
-        return false;
+    public boolean isCompletedRoute() {
+        Maze m = new Maze(Main.map);
+        return m.solveMaze();
     }
 
     public class Maze {
@@ -131,66 +132,80 @@ public class Model {
         int startX = 1;
         int startY = 27; // Starting X and Y values of maze
         int endX, endY;     // Ending X and Y values of maze
-
-        public void solveMaze() {
+        boolean b;
+        public Maze(String[] map){
+            generateMaze(map);
+        }
+        public boolean solveMaze() {
             //Read the map
             //default empty map
             String[] map = {
-                    "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ",
-                    "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ",
-                    "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ",
-                    "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ",
-                    "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         "
+                    "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########",
+                    "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########",
+                    "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########",
+                    "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########",
+                    "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########", "#########"
+
             };
             for (int i = 0; i < 9 * 5; i++) {
                 map[i] = Main.map[i];
             }
 
             maze = generateMaze(map); // Create Maze (1 = path, 2 = wall)
-            for (int row = 0; row < maze.length; row++)
+            for (int row = 0; row < width; row++) {
                 // Sets boolean Arrays to default values
-                for (int col = 0; col < maze[row].length; col++) {
+                for (int col = 0; col < height; col++) {
+
                     wasHere[row][col] = false;
                     correctPath[row][col] = false;
                 }
-            boolean b = recursiveSolve(startX, startY);
+            }
+            //show maze
+
+            b = recursiveSolve(startX, startY);
             // Will leave you with a boolean array (correctPath)
             // with the path indicated by true values.
             // If b is false, there is no solution to the maze
+            return b;
         }
 
         public boolean recursiveSolve(int x, int y) {
             if (x == endX && y == endY) return true; // If you reached the end
-            if (maze[x][y] == 2 || wasHere[x][y]) return false;
-            // If you are on a wall or already were here
-            wasHere[x][y] = true;
-            if (x != 0) // Checks if not on left edge
-                if (recursiveSolve(x - 1, y)) { // Recalls method one to the left
-                    correctPath[x][y] = true; // Sets that path value to true;
-                    return true;
-                }
-            if (x != width - 1) // Checks if not on right edge
-                if (recursiveSolve(x + 1, y)) { // Recalls method one to the right
-                    correctPath[x][y] = true;
-                    return true;
-                }
-            if (y != 0)  // Checks if not on top edge
-                if (recursiveSolve(x, y - 1)) { // Recalls method one up
-                    correctPath[x][y] = true;
-                    return true;
-                }
-            if (y != height - 1) // Checks if not on bottom edge
-                if (recursiveSolve(x, y + 1)) { // Recalls method one down
-                    correctPath[x][y] = true;
-                    return true;
-                }
-            return false;
+
+            if(x < width && y<height) {
+                if (maze[x][y] == 2 || wasHere[x][y]) return false;
+
+                // If you are on a wall or already were here
+                wasHere[x][y] = true;
+
+                if (x != 0) // Checks if not on left edge
+                    if (recursiveSolve(x - 1, y)) { // Recalls method one to the left
+                        correctPath[x][y] = true; // Sets that path value to true;
+                        return true;
+                    }
+                if (x != width - 1) // Checks if not on right edge
+                    if (recursiveSolve(x + 1, y)) { // Recalls method one to the right
+                        correctPath[x][y] = true;
+                        return true;
+                    }
+                if (y != 0)  // Checks if not on top edge
+                    if (recursiveSolve(x, y - 1)) { // Recalls method one up
+                        correctPath[x][y] = true;
+                        return true;
+                    }
+                if (y != height - 1) // Checks if not on bottom edge
+                    if (recursiveSolve(x, y + 1)) { // Recalls method one down
+                        correctPath[x][y] = true;
+                        return true;
+                    }
+                return false;
+            }else{return false;}
         }
 
         private int[][] generateMaze(String[] map) {
-            int[][] cityAsMaze = new int[3 * 9][3 * 5];
-            for (int x = 0; x < 9 * 3; x++) {
-                for (int y = 0; y < 5 * 3; y++) {
+            int[][] cityAsMaze = new int[width][height];
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     cityAsMaze[x][y] = 2;
                 }
             }
@@ -199,18 +214,19 @@ public class Model {
             for (int i = 0; i < map.length; i++) {
                 for (int j = 0; j < 9; j++) {
                     Point ma = toMazeAddress(i,j);
-                    if (map[i] == "" ){
+                    if (map[i].equals("") ){
                         cityAsMaze[ma.x][ma.y] = 2;
                     }
                     else{
-                        if(map[i].charAt(j) == '#'){
+                        if( map[i].charAt(j) == '#'){
                             cityAsMaze[ma.x][ma.y] = 2;
                         }
-                        else{
+                        else if(map[i].charAt(j) == ' '){
                             cityAsMaze[ma.x][ma.y] = 1;
                         }
+                        else{}
                     }
-                    System.out.print(cityAsMaze[ma.x][ma.y]);
+
                 }
 
             }
@@ -223,6 +239,15 @@ public class Model {
             ma.y = ((mapIndex-(mapIndex%9))/9) * 3 +((indexOnMappiece-(indexOnMappiece%3))/3);
             ma.x = ((mapIndex%9)*3) +(indexOnMappiece%3);
             return ma;
+        }
+        private Point indexToPoint(int mapIndex){
+            Point ma = new Point();
+            ma.y = (mapIndex-(mapIndex%9))/9;
+            ma.x = (mapIndex%9);
+            return ma;
+        }
+        private int pointToIndex(Point mapAddress){
+            return mapAddress.x *9 + mapAddress.y;
         }
     }
 

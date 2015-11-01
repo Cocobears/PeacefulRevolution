@@ -34,7 +34,7 @@ public class GameData {
 
     static String mapPieceNoExit = "# # » # #";
 
-    static String mapPieceStart = "# # S # #";
+    static String mapPieceStart = "# #   # #";
 
     static String mapPiecePalace = "# # ¤ # #";
 
@@ -47,7 +47,7 @@ public class GameData {
 
             //home
             mapPieceStart,
-            mapPieceHouses,
+
 
 //5 with 4 exits
             mapPiece4Exits,
@@ -96,10 +96,7 @@ public class GameData {
             mapPieceNoExit,
             mapPieceNoExit,
 
-            mapPiecePresident,
 
-            mapPiecePalace,
-            mapPiecePalace
 
 
     };
@@ -134,6 +131,8 @@ public class GameData {
 
     };
 
+
+
     public static int getCurrentPlayer() {
 
         return currentPlayer;
@@ -164,6 +163,7 @@ public class GameData {
         for (String t : techCards) {
             d.add(t);
         }
+
         Collections.shuffle(d);
         return d;
     }
