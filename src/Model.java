@@ -130,9 +130,9 @@ public class Model {
         boolean[][] wasHere = new boolean[width][height];
         boolean[][] correctPath = new boolean[width][height]; // The solution to the maze
         int startX = 1;
-        int startY = 27; // Starting X and Y values of maze
+        int startY = 7; // Starting X and Y values of maze
         int endX = 25;
-        int endY = Main.presidentsLocation*3-2 ;     // Ending X and Y values of maze
+        int endY = Main.presidentsLocation*3-2 ;     // Ending X and Y values of maze 1,7,13
         boolean b;
         public Maze(String[] map){
             generateMaze(map);
@@ -164,47 +164,13 @@ public class Model {
             //show maze
 
             b = recursiveSolve(startX, startY);
+
             // Will leave you with a boolean array (correctPath)
             // with the path indicated by true values.
             // If b is false, there is no solution to the maze
             return b;
         }
-         //idea for a new solver as the last one does not yet work
-        public boolean solve(int r, int c){
-            if (maze[r][c] == 3){
-                return true;
-            }
-
-            // mark the current cell as on the path
-            maze[r][c] = 4;
-
-            // try all available neighbours - if any of these return true then we're solved
-            if (available(r - 1, c) && solve(r - 1, c)) {
-                return true;
-            }
-            if (available(r + 1, c) && solve(r + 1, c)) {
-                return true;
-            }
-            if (available(r, c - 1) && solve(r, c - 1)) {
-                return true;
-            }
-            if (available(r, c + 1) && solve(r, c + 1)) {
-                return true;
-            }
-
-            // nothing found so remove the current cell from the path and backtrack
-            maze[r][c] = 1;
-
-            return false;
-
-        }
-        // cell is available if it is in the maze and either a clear space or the
-        // goal - it is not available if it is a wall or already on the current path
-        private boolean available(int r, int c) {
-            return r >= 0 && r < maze.length
-                    && c >= 0 && c < maze[r].length
-                    && (maze[r][c] == 0 || maze[r][c] == 3);
-        }
+       
 
         public boolean recursiveSolve(int x, int y) {
             if (x == endX && y == endY) return true; // If you reached the end
