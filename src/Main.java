@@ -21,7 +21,7 @@ public class Main {
     static LinkedList<PlayerData> players;
     private static String name;
     public static String[] map = new String[45];
-    private final int presidentsLocation;
+    public static int presidentsLocation;
     String[] playernames;
     static JFrame mainFrame = new JFrame();
     static JPanel[] cityStreets = new JPanel[9*5];
@@ -31,7 +31,7 @@ public class Main {
     static JPanel cardPanel = new JPanel();
     static String currentCard;
     static JPanel board = new JPanel(new GridLayout(5, 9));
-    static JPanel data;
+    static JPanel data =new JPanel();
     static boolean clickable = true;
     static JButton endTurn;
     static LinkedList<String> currentHand = new LinkedList<String>();
@@ -43,9 +43,6 @@ public class Main {
 
     static Model modelOfGame = new Model();
     public static void main(String[] args) {
-
-
-
 
         new Main();
 
@@ -105,6 +102,7 @@ public class Main {
         OkListener okListener = new OkListener();
         ok.addActionListener(okListener);
         mainFrame.setSize(800, 600);
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         startUpScreen.add(name);
         startUpScreen.add(nameField);
         startUpScreen.add(numberOfPlayersLabel);
@@ -121,7 +119,7 @@ public class Main {
     public Main() {
         //initial
         for (int i = 0; i < 45; i++) {
-            map[i] = "         ";
+            map[i] = "";
         }
         // GameData game = new GameData();
         deck = GameData.generateDeck();
@@ -169,6 +167,8 @@ public class Main {
         if(GameData.deckDepleted && isAllPassing()){
             //loyalists win
             b = false;
+            //revolutionaries win
+
         }else{}
 
         return b;
@@ -340,8 +340,14 @@ public class Main {
 
                 if (e.getComponent() == cityStreets[i] &&
                         clickable && //make sure there is only one effective click
-                        map[i].equals("         ") //checks that there are no existing mappieces
+                        map[i].equals("") && //checks that there are no existing mappieces
+                        isNearMapPiece(i)//checks a nearby mappiece to fit the new one in
                         ) {
+                    if (    i == 7 ||
+                            i == 25||
+                            i == 43||
+                            i == 16||
+                            i == 35)nearPalace(map);
                     cardPanel.setVisible(false);
                     cityStreets[i].removeAll();
                     cityStreets[i].add(drawStreet(currentCard));
@@ -353,43 +359,97 @@ public class Main {
                     clickable = false;
                     break;
                 }
-                nearPalace(i);
+
             }
         }
 
-        private void nearPalace(int i) {
-            if (    i == 7 ||
-                    i == 25||
-                    i == 43||
-                    i == 17||
-                    i == 36){
-                System.out.println("checking for possiblity of a win");
-                if(isRouteComplete()){
-                    System.out.println("You won!");
-                }
-            }
-        }
-
-        private boolean isRouteComplete() {
-                    return modelOfGame.isCompletedRoute();
-        }
-
+        @Override
         public void mousePressed(MouseEvent e) {
 
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
 
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
 
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
 
         }
-    }
+
+        private Point indexToPoint(int mapIndex){
+            Point ma = new Point();
+            ma.y = (mapIndex-(mapIndex%9))/9;
+            ma.x = (mapIndex%9);
+            return ma;
+        }
+        private boolean isNearMapPiece(int indexOfNewPiece){
+            int x = (int) indexToPoint(indexOfNewPiece).getX();
+            int y = (int) indexToPoint(indexOfNewPiece).getY();
+
+            //one up
+            //is there a location
+            if(y-1>=0) {
+                //is there a piece at the location
+                if(!map[indexOfNewPiece-9].equals(""))return true;
+            }
+            //one right
+            //is there a location
+            if(x+1 < 9) {
+                //is there a piece at the location
+                if(!map[indexOfNewPiece+1].equals(""))return true;
+            }
+            //one at bottom
+            //is there a location
+            if(y+1<5) {
+                //is there a piece at the location
+                if(!map[indexOfNewPiece+9].equals(""))return true;
+            }
+
+
+            //one left
+            if(x-1 >=0) {
+                //is there a piece at the location
+                if (!map[indexOfNewPiece - 1].equals("")) return true;
+            }
+            return false;
+        }
+
+
+
+
+        }
+        private static void nearPalace(String[] map) {
+            int width = 27;
+            int height =15;
+            System.out.println("checking for possiblity of a win");
+            int[][] maze = new Model.Maze(map).generateMaze(map);
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    System.out.print(maze[x][y]);
+                }
+                System.out.println();
+            }
+            if(isRouteComplete()){
+                System.out.println("Revolutionaries won!");
+            }else{
+                System.out.println("NOT YET COMPLETE");
+            }
+
+
+        }
+
+        private static boolean isRouteComplete() {
+                    return modelOfGame.isCompletedRoute();
+        }
+
+
 
     public static void createGUI() {
         //main
@@ -404,7 +464,7 @@ public class Main {
             cityStreets[x] = new JPanel();
 
         }
-        //create the streets as a test
+        //create the streets as a testjava
         //setup the streets
         int cardValue = -1;
         int index = 0;
@@ -415,18 +475,14 @@ public class Main {
 
         for (int x = 0; x < 45; x++) {
             //first row
-            if (x % 9 == 0) {
-                JPanel street = drawStreet(GameData.mapPieceHouses);
-                cityStreets[x].removeAll();
-                cityStreets[x].add(street);
 
-            } else {
-            }
+
             //add start
             if (x == (9+9)-1+1) {
                 JPanel street = drawStreet(GameData.mapPieceStart);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
+                map[18] = GameData.mapPieceStart;
             } else {
             }
             //last row
@@ -460,7 +516,7 @@ public class Main {
 
 
         //data table
-        data = new JPanel(new GridLayout(4, 2));
+        data.setLayout(new GridLayout(4, 2));
 
         JLabel labelName = new JLabel("NAME: ");
         JLabel infoName = new JLabel(name);

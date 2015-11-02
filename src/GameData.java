@@ -36,7 +36,7 @@ public class GameData {
 
     static String mapPieceStart = "# #   # #";
 
-    static String mapPiecePalace = "# # ¤ # #";
+    static String mapPiecePalace = "# #   # #";
 
     static String mapPiecePresident = "# # P # #";
 

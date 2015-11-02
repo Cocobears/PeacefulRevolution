@@ -123,7 +123,7 @@ public class Model {
         return m.solveMaze();
     }
 
-    public class Maze {
+    public static class Maze {
         int height = 5 * 3;
         int width = 9 * 3;
         int[][] maze = new int[width][height]; // The maze
@@ -131,7 +131,8 @@ public class Model {
         boolean[][] correctPath = new boolean[width][height]; // The solution to the maze
         int startX = 1;
         int startY = 27; // Starting X and Y values of maze
-        int endX, endY;     // Ending X and Y values of maze
+        int endX = 25;
+        int endY = Main.presidentsLocation*3-2 ;     // Ending X and Y values of maze
         boolean b;
         public Maze(String[] map){
             generateMaze(map);
@@ -168,6 +169,42 @@ public class Model {
             // If b is false, there is no solution to the maze
             return b;
         }
+         //idea for a new solver as the last one does not yet work
+        public boolean solve(int r, int c){
+            if (maze[r][c] == 3){
+                return true;
+            }
+
+            // mark the current cell as on the path
+            maze[r][c] = 4;
+
+            // try all available neighbours - if any of these return true then we're solved
+            if (available(r - 1, c) && solve(r - 1, c)) {
+                return true;
+            }
+            if (available(r + 1, c) && solve(r + 1, c)) {
+                return true;
+            }
+            if (available(r, c - 1) && solve(r, c - 1)) {
+                return true;
+            }
+            if (available(r, c + 1) && solve(r, c + 1)) {
+                return true;
+            }
+
+            // nothing found so remove the current cell from the path and backtrack
+            maze[r][c] = 1;
+
+            return false;
+
+        }
+        // cell is available if it is in the maze and either a clear space or the
+        // goal - it is not available if it is a wall or already on the current path
+        private boolean available(int r, int c) {
+            return r >= 0 && r < maze.length
+                    && c >= 0 && c < maze[r].length
+                    && (maze[r][c] == 0 || maze[r][c] == 3);
+        }
 
         public boolean recursiveSolve(int x, int y) {
             if (x == endX && y == endY) return true; // If you reached the end
@@ -202,7 +239,7 @@ public class Model {
             }else{return false;}
         }
 
-        private int[][] generateMaze(String[] map) {
+        public int[][] generateMaze(String[] map) {
             int[][] cityAsMaze = new int[width][height];
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
