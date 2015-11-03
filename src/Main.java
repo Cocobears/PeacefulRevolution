@@ -343,6 +343,7 @@ public class Main {
                         map[i].equals("") && //checks that there are no existing mappieces
                         isNearMapPiece(i)//checks a nearby mappiece to fit the new one in
                         ) {
+                    map[i] = currentCard;//add currentcard to map
                     if (    i == 7 ||
                             i == 25||
                             i == 43||
@@ -351,7 +352,7 @@ public class Main {
                     cardPanel.setVisible(false);
                     cityStreets[i].removeAll();
                     cityStreets[i].add(drawStreet(currentCard));
-                    map[i] = currentCard;//add currentcard to map
+
                     board.repaint();
                     mainFrame.pack();
                     cityStreets[i].setVisible(true);
@@ -359,7 +360,6 @@ public class Main {
                     clickable = false;
                     break;
                 }
-
             }
         }
 
@@ -490,16 +490,19 @@ public class Main {
                JPanel street = drawStreet(GameData.mapPiecePalace);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
+                map[x] =  GameData.mapPiecePalace;
             }else{}
             if (x == 3*9-1){
                 JPanel street = drawStreet(GameData.mapPiecePalace);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
+                map[x] =  GameData.mapPiecePalace;
             }else{}
             if(x == 5*9 -1){
                 JPanel street = drawStreet(GameData.mapPiecePalace);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
+                map[x] =  GameData.mapPiecePalace;
             }else{}
 
             MListener el = new MListener();
