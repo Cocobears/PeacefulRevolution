@@ -17,6 +17,7 @@ public class GameData {
     static boolean deckDepleted = false;
 
     static boolean routeExists = false;
+    static LinkedList<String[]> gameHistory =  new LinkedList<>();
 
     static int currentPlayer = 0;
     //MAP bits

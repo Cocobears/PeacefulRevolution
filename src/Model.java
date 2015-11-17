@@ -170,7 +170,7 @@ public class Model {
             // If b is false, there is no solution to the maze
             return b;
         }
-       
+
 
         public boolean recursiveSolve(int x, int y) {
             if (x == endX && y == endY) return true; // If you reached the end
@@ -253,6 +253,30 @@ public class Model {
             return mapAddress.x *9 + mapAddress.y;
         }
     }
+    public static class Actions{
+        //TODO: actions
+        //violence and guards
+        //corruption and reporters
+        //injustice and lawyers
+        //hints
+        public void getHint(boolean narking){
+            if(narking){
 
+            }
+            else{
+
+            }
+
+        }
+
+        static boolean informerSpeaks = false;
+        public void setInformerSpeaks(){
+            informerSpeaks = true;
+        }
+        public void setInformerSilent(){
+            informerSpeaks = false;
+        }
+
+    }
 
 }
