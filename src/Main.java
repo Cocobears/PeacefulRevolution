@@ -9,6 +9,8 @@ import java.awt.event.MouseListener;
 import java.util.Collections;
 import java.util.LinkedList;
 
+
+
 public class Main {
 
     public static JPanel startUpScreen;
@@ -22,12 +24,16 @@ public class Main {
     private static String name;
     public static String[] map = new String[45];
     public static int presidentsLocation;
+    private static JLabel infoName;
+    private static JLabel infoSupport;
+    private static JLabel infoALLEGIANCE;
     String[] playernames;
     static JFrame mainFrame = new JFrame();
     static JPanel[] cityStreets = new JPanel[9*5];
     static JLabel[][] street = new JLabel[3][3];
-
-
+    static JButton leftCard = new JButton("<");
+    static JButton rightCard = new JButton(">");
+    static public int currentPlayer =0;
     static JPanel cardPanel = new JPanel();
     static String currentCard;
     static JPanel board = new JPanel(new GridLayout(5, 9));
@@ -40,7 +46,9 @@ public class Main {
     static JButton infoCards;
     static int winnerID = -1;
     private final int nofRounds = 3;
-
+    final static int NAME = 1;
+    final static int SUPPORT =3;
+    final static int ALLEGIANCE = 5;
     static Model modelOfGame = new Model();
     public static void main(String[] args) {
 
@@ -101,7 +109,7 @@ public class Main {
 
         OkListener okListener = new OkListener();
         ok.addActionListener(okListener);
-        mainFrame.setSize(800, 600);
+        mainFrame.setSize(800, 640);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         startUpScreen.add(name);
         startUpScreen.add(nameField);
@@ -118,60 +126,92 @@ public class Main {
 
     public Main() {
         //initial
-        for (int i = 0; i < 45; i++) {
-            map[i] = "";
-        }
+        clearMap();
         // GameData game = new GameData();
-        deck = GameData.generateDeck();
-        currentCard = GameData.drawCard(deck);
+
         startUpScreen = new JPanel();
         display(startUpScreen);//also runs the mainFrame once startupscreen completes
         players = createPlayerData(nofPlayers);
-        presidentsLocation = 1+2*(int)(Math.random()*3);
-        System.out.println("presidentsLocation :" + presidentsLocation );
-        Model gameMechanics = new Model();
+
         ///////////////////////
         //game routine
         //////////////////////
         for (int i = 0; i < nofRounds; i++) {
+            deck = GameData.generateDeck();
+            currentCard = GameData.drawCard(deck);
+            presidentsLocation = 1 + 2 * (int) (Math.random() * 3);
+            System.out.println("presidentsLocation :" + presidentsLocation);
+            Model gameMechanics = new Model();
+
             do {
                 //game play in single player mode
-                for(PlayerData p : players){
-                    //setData()
+                for (PlayerData p : players) {
+                    //
+                    (infoName).setText(p.name);
+                    (infoALLEGIANCE).setText(p.allegiance);
+                    (infoSupport).setText(p.supportGained + "");
+                    p.hand.add(currentCard);
+
+                    if(currentPlayer<nofPlayers){currentPlayer++;}
+                    else {currentPlayer = 0;}
                 }
                 //gameplay in multiplayer mode
                 //
             } while (isEndOfRound());
             gameMechanics.distributeBounty();
+            //clear Board
+            board.removeAll();
+            //clear map
+            clearMap();
         }
         //find the winner of the 3 game rounds
         int max = 0;
         for (int i = 0; i < nofPlayers; i++) {
-            if(max<players.get(i).supportGained) {
+            if (max < players.get(i).supportGained) {
                 max = players.get(i).supportGained;
             }
         }
         //VICTORY MESSAGE
         data.removeAll();
-        JLabel victoryMessage =  new JLabel();
+        JLabel victoryMessage = new JLabel();
 
         data.add(victoryMessage);
-        for (int i =0 ; i< nofPlayers;i++) {
-            if(players.get(i).supportGained == max)victoryMessage.setText("Winner: " + players.get(i).name);
+        for (int i = 0; i < nofPlayers; i++) {
+            if (players.get(i).supportGained == max) victoryMessage.setText("Winner: " + players.get(i).name);
 
+        }
+    }
+    public enum DataTable{
+
+        NAME(1),
+        ALLEGIANCE(5),
+        SUPPORT(3)
+        ;
+        private int index;
+        DataTable(int index) {
+             this.index = index;
+        }
+        public int geti(){
+            return index;
+        }
+
+    }
+    private void clearMap() {
+        for (int i = 0; i < 45; i++) {
+            map[i] = "";
         }
     }
 
     private boolean isEndOfRound() {
-        boolean b = true;
+        boolean endOfRound = false;
         if(GameData.deckDepleted && isAllPassing()){
             //loyalists win
-            b = false;
+            endOfRound = true;
             //revolutionaries win
 
         }else{}
 
-        return b;
+        return endOfRound;
     }
 
     private boolean isAllPassing() {
@@ -194,15 +234,18 @@ public class Main {
             PlayerData n = new PlayerData();
             players.add(n);
         }
-
+        //name the players
         players.get(0).name = name;
+        for (int i = 0; i < GameData.numberOfPlayers; i++) {
+            players.get(i).name = "AIbot"+i;
+        }
         //set allegiance
         LinkedList allegianceDeck = setAllegianceDeck();
         for (int i = 0; i < nofPlayers; i++) {
             players.get(i).allegiance = (String) allegianceDeck.getFirst();
             allegianceDeck.removeFirst();
         }
-        //
+        //set ids
         for (int i = 0; i < nofPlayers; i++) {
             players.get(i).id = i;
         }
@@ -234,7 +277,8 @@ public class Main {
     public static class OkListener implements ActionListener {
 
 
-        private JFrame optionsFrame  = new JFrame();;
+        private JFrame optionsFrame  = new JFrame();
+
 
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == ok) {
@@ -280,6 +324,23 @@ public class Main {
 
                 //optionsFrame.dispose();
             }
+            if (e.getSource() == leftCard) {
+                if(players.get(currentPlayer).cardInFocus>=0) {
+                    int x = players.get(currentPlayer).cardInFocus > 0 ? players.get(currentPlayer).cardInFocus - 1 : nofPlayers;
+                    currentCard = players.get(currentPlayer).hand.get(x);
+                    //remove cardpanel card from players hand and redisplay hand
+                    cardPanel.add(drawStreet(currentCard));
+                }else{}
+            }
+            if (e.getSource() == rightCard) {
+                if(players.get(currentPlayer).cardInFocus>=0) {
+                    int x = players.get(currentPlayer).cardInFocus < nofPlayers ? players.get(currentPlayer).cardInFocus + 1 : nofPlayers;
+                    currentCard = players.get(currentPlayer).hand.get(x);
+                    cardPanel.add(drawStreet(currentCard));
+                }else{
+
+                }
+            }
         }
 
     }
@@ -297,10 +358,27 @@ public class Main {
                 //new card
 
                 cardPanel.removeAll();
+                cardPanel.add(leftCard);
                 cardPanel.add(drawStreet(currentCard));
+                cardPanel.add(rightCard);
                 cardPanel.repaint();
                 mainFrame.pack();
                 cardPanel.setVisible(true);
+            }
+            if(e.getSource() == cityStreets[8]){
+                if(presidentsLocation ==1 && Model.Actions.informerSpeaks){
+                    System.out.println("President is here!");
+                }else{System.out.println("President has escaped!");}
+            }
+            if(e.getSource() == cityStreets[17]){
+                if(presidentsLocation ==3 && Model.Actions.informerSpeaks){
+                    System.out.println("President is here!");
+                }else{System.out.println("President has escaped!");}
+            }
+            if(e.getSource() == cityStreets[44]){
+                if(presidentsLocation ==5 && Model.Actions.informerSpeaks){
+                    System.out.println("President is here!");
+                }else{System.out.println("President has escaped!");}
             }
 
         }
@@ -343,19 +421,20 @@ public class Main {
                         map[i].equals("") && //checks that there are no existing mappieces
                         isNearMapPiece(i)//checks a nearby mappiece to fit the new one in
                         ) {
+
+                    cardPanel.setVisible(false);
+                    cityStreets[i].removeAll();
+                    cityStreets[i].add(drawStreet(currentCard));
+                    map[i] = currentCard;//add currentcard to map
                     if (    i == 7 ||
                             i == 25||
                             i == 43||
                             i == 16||
                             i == 35)nearPalace(map);
-                    cardPanel.setVisible(false);
-                    cityStreets[i].removeAll();
-                    cityStreets[i].add(drawStreet(currentCard));
-                    map[i] = currentCard;//add currentcard to map
                     board.repaint();
                     mainFrame.pack();
                     cityStreets[i].setVisible(true);
-                    //currentCard = null;
+                    //currentCard = null;//TODO: should be stored instead!!!
                     clickable = false;
                     break;
                 }
@@ -449,7 +528,9 @@ public class Main {
                     return modelOfGame.isCompletedRoute();
         }
 
+    public static void createCardPanel(){
 
+    }
 
     public static void createGUI() {
         //main
@@ -457,15 +538,14 @@ public class Main {
         //board
         board = new JPanel(new GridLayout(5, 9));
         board.setPreferredSize(new Dimension(800, 500));
-
+        //TODO add listener here for the palaces when hints are played
         //contents of the board
         for (int x = 0; x < 45; x++) {
-
             cityStreets[x] = new JPanel();
-
         }
         //create the streets as a testjava
         //setup the streets
+        EndListener ml = new EndListener();
         int cardValue = -1;
         int index = 0;
         for (int x = 0; x < 45; x++) {
@@ -485,21 +565,27 @@ public class Main {
                 map[18] = GameData.mapPieceStart;
             } else {
             }
-            //last row
+            //last row AREA of PALACES
             if (x == 9-1) {
                JPanel street = drawStreet(GameData.mapPiecePalace);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
+                cityStreets[x].addMouseListener(ml);
+                map[8] = GameData.mapPiecePalace;
             }else{}
             if (x == 3*9-1){
                 JPanel street = drawStreet(GameData.mapPiecePalace);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
+                cityStreets[x].addMouseListener(ml);
+                map[26] = GameData.mapPiecePalace;
             }else{}
             if(x == 5*9 -1){
                 JPanel street = drawStreet(GameData.mapPiecePalace);
                 cityStreets[x].removeAll();
                 cityStreets[x].add(street);
+                cityStreets[x].addMouseListener(ml);
+                map[44] = GameData.mapPiecePalace;
             }else{}
 
             MListener el = new MListener();
@@ -519,24 +605,23 @@ public class Main {
         data.setLayout(new GridLayout(4, 2));
 
         JLabel labelName = new JLabel("NAME: ");
-        JLabel infoName = new JLabel(name);
+        infoName = new JLabel(name);
         data.add(labelName);
         data.add(infoName);
 
         JLabel labelSUPPORT = new JLabel("SUPPORT:");
-        JLabel infoSupport;
         infoSupport = new JLabel(Integer.toString(players.get(0).supportGained));
         data.add(labelSUPPORT);
         data.add(infoSupport);
 
         JLabel labelALLEGIANCE = new JLabel("ALLEGIANCE:");
-        JLabel infoALLEGIANCE = new JLabel(players.get(0).allegiance);
+        infoALLEGIANCE = new JLabel(players.get(0).allegiance);
 
         data.add(labelALLEGIANCE);
         data.add(infoALLEGIANCE);
 
         endTurn = new JButton("End Turn");
-        EndListener ml = new EndListener();
+
         endTurn.addMouseListener(ml);
 
         infoCards = new JButton();
@@ -564,22 +649,31 @@ public class Main {
         playerScreenSouth.setPreferredSize(new Dimension(70, 120));
         playerScreenSouth.add(data);
         //Current Card Panel
+        createCardPanel(icl, playerScreenSouth);
+        mainPanel.add(playerScreenSouth, BorderLayout.SOUTH);
+        //completion of mainFrame
+        mainPanel.setVisible(true);
+        mainFrame.add(mainPanel);
+        mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mainFrame.pack();
+        mainFrame.setVisible(true);
+    }
+
+    private static void createCardPanel(OkListener icl, JPanel playerScreenSouth) {
+        cardPanel.add(leftCard);
+        leftCard.addActionListener(icl);
+
         if (currentCard.charAt(0) == '#') {
             cardPanel.add(drawStreet(currentCard));
         } else {
             players.get(0).techHand.add(currentCard.substring(0, 1));
             infoCards.setText(players.get(0).techHand.toString());
         }
+        cardPanel.add(rightCard);
+        rightCard.addActionListener(icl);
         MListener el = new MListener();
         cardPanel.addMouseListener(el);
         playerScreenSouth.add(cardPanel);
-        mainPanel.add(playerScreenSouth, BorderLayout.SOUTH);
-
-        mainPanel.setVisible(true);
-        mainFrame.add(mainPanel);
-        mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        mainFrame.pack();
-        mainFrame.setVisible(true);
     }
 
 
